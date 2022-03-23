@@ -10,3 +10,6 @@ function throttle(func, wait) {
         }
     }
 }
+
+// // 示例
+// window.onmousemove = throttle(handleMouseMove, 1000);
