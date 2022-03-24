@@ -18,5 +18,13 @@
 
         res = add.apply2({ name: 123 }, [5, 6]);
         console.info(res);
+
+        let c = "c in window.";
+        function testBind(a, b) {
+            console.info(a, b, this.c);
+        }
+        testBind(1, 2);
+        testBind.bind({c: "my c."}, 3, 4)();
+        
     </script>
 </html>

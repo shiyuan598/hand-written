@@ -22,5 +22,7 @@ Function.prototype.apply2 = function(thisArg, args) {
 
 // bind方法
 Function.prototype.bind2 = function(thisArg, ...args) {
-    
+    return function() {
+        return this.call(thisArg, ...args);
+    }
 }
