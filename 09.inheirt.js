@@ -1,5 +1,4 @@
 // 组合继承
-
 function F(name) {
     this.name = name;
 }
@@ -26,3 +25,23 @@ S.prototype.showAge = function () {
 let s = new S("S", 3);
 s.showName();
 s.showAge();
+
+// class继承
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    getName() {
+        return this.name;
+    }
+}
+
+class Dog extends Animal {
+    constructor(name, age) {
+        super(name);
+        this.age = age;
+    }
+    getAge() {
+        return this.age;
+    }
+}
