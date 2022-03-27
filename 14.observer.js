@@ -52,10 +52,11 @@ new Promise((resolve, reject) => {
             reject();
         }
     }, 3000);
-})
-    .then(() => {
+}).then(
+    () => {
         greenTea.notify("I broke up.");
-    })
-    .catch(() => {
+    },
+    () => {
         greenTea.notify("I have met someone.");
-    });
+    }
+);
