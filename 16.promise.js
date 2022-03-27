@@ -79,4 +79,41 @@ class Promise2 {
             reject(error);
         }
     }
+
+    static resolve(value) {
+        return new Promise2((resolve, reject) => {
+            if (value instanceof Promise2) {
+                value.then(resolve, reject);
+            } else {
+                resolve(value);
+            }
+        });
+    }
+
+    static all(promises) {
+        return new Promise2((resolve, reject) => {
+            let results = [];
+            promises.forEach((promise) => {
+                promise.then(
+                    (value) => {
+                        results.push(value);
+                        if (results.length === promises.length) {
+                            resolve(results);
+                        }
+                    },
+                    (reason) => {
+                        reject(reason);
+                    }
+                );
+            });
+        });
+    }
+
+    static race(promises) {
+        return new Promise2((resolve, reject) => {
+            promises.forEach((promise) => {
+                promise.then(resolve, reject);
+            });
+        });
+    }
 }

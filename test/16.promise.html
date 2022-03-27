@@ -41,5 +41,36 @@
                 }
             );
         console.info("peanut");
+
+        Promise2.resolve(
+            new Promise2((resolve, reject) => {
+                reject(456);
+                resolve("345");
+            })
+        ).then(console.info, console.info);
+
+        Promise2.all([
+            new Promise2((resolve, reject) => {
+                // reject(1)
+                resolve(1);
+            }),
+            new Promise2((resolve, reject) => {
+                reject(2);
+                resolve(2);
+            })
+        ]).then(console.info, console.info);
+
+        Promise2.race([
+            new Promise2((resolve, reject) => {
+                setTimeout(() => {
+                    resolve("a");
+                }, 2000);
+            }),
+            new Promise2((resolve, reject) => {
+                setTimeout(() => {
+                    resolve("b");
+                }, 1000);
+            })
+        ]).then(console.info, console.info);
     </script>
 </html>
