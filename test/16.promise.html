@@ -11,26 +11,33 @@
     <script>
         let promise = new Promise2((resolve, reject) => {
             setTimeout(() => {
-                resolve("解决");
                 reject("拒绝");
+                resolve("解决");
             }, 1000);
         })
             .then(
                 (value) => {
                     console.info(value);
-                    return "then1 success."
+                    return new Promise2((resolve, reject) => {
+                        resolve("then1 success.");
+                    });
+                    return "then1 success.";
                 },
                 (reason) => {
-                    console.error(reason);
-                    return "then1 reject."
+                    console.info(reason);
+                    return new Promise2((resolve, reject) => {
+                        resolve("then1 reject.");
+                    });
+                    return "then1 reject.";
                 }
             )
+            .then()
             .then(
                 (value) => {
                     console.info(value);
                 },
                 (reason) => {
-                    console.error(reason);
+                    console.info("Error:" + reason);
                 }
             );
         console.info("peanut");

@@ -39,52 +39,44 @@ class Promise2 {
 
     then(onFulfilled, onRejected) {
         if (typeof onFulfilled !== "function") {
-            onFulfilled = () => {};
+            onFulfilled = () => this.value;
         }
         if (typeof onRejected !== "function") {
-            onRejected = () => {};
+            onRejected = () => this.value;
         }
         return new Promise2((resolve, reject) => {
             if (this.status === Promise2.PENDING) {
                 this.callbacks.push({
                     onFulfilled: (value) => {
-                        try {
-                            let result = onFulfilled(value);
-                            resolve(result);
-                        } catch (error) {
-                            onRejected(error);
-                        }
+                        this.parse(onFulfilled(value), resolve, reject);
                     },
                     onRejected: (reason) => {
-                        try {
-                            let result = onRejected(reason);
-                            resolve(result);
-                        } catch (error) {
-                            onRejected(error);
-                        }
+                        this.parse(onRejected(reason), resolve, reject);
                     }
                 });
             }
             if (this.status === Promise2.FULFILLED) {
                 setTimeout(() => {
-                    try {
-                        let result = onFulfilled(this.value);
-                        resolve(result);
-                    } catch (error) {
-                        onRejected(error);
-                    }
+                    this.parse(onFulfilled(this.value), resolve, reject);
                 });
             }
             if (this.status === Promise2.REJECTED) {
                 setTimeout(() => {
-                    try {
-                        let result = onRejected(this.value);
-                        resolve(result);
-                    } catch (error) {
-                        onRejected(error);
-                    }
+                    this.parse(onRejected(this.value), resolve, reject);
                 });
             }
         });
+    }
+
+    parse(result, resolve, reject) {
+        try {
+            if (result instanceof Promise2) {
+                result.then(resolve, reject);
+            } else {
+                resolve(result);
+            }
+        } catch (error) {
+            reject(error);
+        }
     }
 }
