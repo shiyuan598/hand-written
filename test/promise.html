@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Promise</title>
+    </head>
+    <body></body>
+    <script>
+        class Promise2 {
+            static PENDING = "pending";
+            static FULFILLED = "fulfilled";
+            static REJECTED = "rejected";
+            constructor(executor) {
+                this.status = Promise2.PENDING;
+                this.value = null;
+                this.callbacks = [];
+                executor(this.resolve.bind(this), this.reject.bind(this));
+            }
+
+            resolve(value) {
+                if (this.status === Promise2.PENDING) {
+                    this.value = value;
+                    this.status = Promise2.FULFILLED;
+                    this.callbacks.forEach((callback) => {
+                        callback.onFulfilled(this.value);
+                    });
+                }
+            }
+
+            reject(reason) {
+                if (this.status === Promise2.PENDING) {
+                    this.value = reason;
+                    this.status = Promise2.REJECTED;
+                    this.callbacks.forEach((callback) => {
+                        callback.onRejected(this.value);
+                    });
+                }
+            }
+
+            then(onFulfilled, onRejected) {
+                // 如果resolve,reject是异步执行的，此时执行到then时promise状态还没改变
+                // 把then的方法存起来，等promise状态改变后执行（resolve或reject后执行）
+                return new Promise2((resolve, reject) => {
+                    if (this.status === Promise2.PENDING) {
+                        console.info("penging 001");
+                        this.callbacks.push({
+                            onFulfilled: () => {
+                                let res = onFulfilled(this.value);
+                                resolve(res);
+                            },
+                            onRejected: () => {
+                                let res = onRejected(this.value);
+                                resolve(res);
+                            }
+                        });
+                    }
+                    if (this.status === Promise2.FULFILLED) {
+                        let res = onFulfilled(this.value);
+                        // resolve(res);
+                    }
+                    if (this.status === Promise2.REJECTED) {
+                        let res = onRejected(this.value);
+                        // resolve(res);
+                    }
+                });
+            }
+        }
+
+        let promise = new Promise2((resolve, reject) => {
+            setTimeout(() => {
+                reject("2");
+                resolve("1");
+            }, 100);
+        })
+            .then(
+                (v) => {
+                    console.info("success: " + v);
+                    return "then1 success.";
+                },
+                (r) => {
+                    console.info("error: " + r);
+                    return "then1 error.";
+                }
+            )
+            .then(
+                (v) => {
+                    console.info("then2: " + v);
+                },
+                (r) => {
+                    console.info("then2: " + r);
+                }
+            );
+        console.info(promise);
+    </script>
+</html>

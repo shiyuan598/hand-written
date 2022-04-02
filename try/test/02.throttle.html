@@ -5,15 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Throttle</title>
-    <script src="../src/02.throttle.js"></script>
+    <script src="../02.throttle.js"></script>
 </head>
 <body>
     
 </body>
 <script>
-    window.onmousemove = throttle(handleMouseMove, 1000);
-    function handleMouseMove(e) {
-        console.info(e);
-    }
+    window.onmousemove = throttle2(console.info, 1000);
 </script>
 </html>
