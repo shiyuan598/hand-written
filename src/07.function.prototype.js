@@ -4,9 +4,7 @@
 Function.prototype.call2 = function(thisArg, ...args) {
     let context = thisArg || window;
     context.fn = this;
-    console.info("context:", context);
-    console.info("this: ", this);
-    let res = eval(`context.fn(${args})`);
+    let res = context[fn](...args);
     delete context.fn;
     return res;
 }
@@ -15,14 +13,15 @@ Function.prototype.call2 = function(thisArg, ...args) {
 Function.prototype.apply2 = function(thisArg, args) {
     let context = thisArg || window;
     context.fn = this;
-    let res = eval(`context.fn(${args})`);
+    let res = context[fn](...args);
     delete context.fn;
     return res;
 }
 
 // bind方法
 Function.prototype.bind2 = function(thisArg, ...args) {
+    let thisFn = this;
     return function() {
-        return this.call(thisArg, ...args);
+        return thisFn.call(thisArg, ...args);
     }
 }
