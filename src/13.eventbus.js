@@ -1,3 +1,5 @@
+// 发布订阅模式
+// 有三个对象，事件调度中心EventChannel，发布者Publisher，订阅者Subscriber
 class EventEmitter {
     constructor() {
         this.events = {};
