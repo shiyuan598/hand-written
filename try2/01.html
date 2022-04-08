@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+  <script>
+    // 防抖，是把连续的高频操作优化为最后一次的操作
+    function debounce(fn, wait) {
+      let timeout = null;
+      let context = this;
+      return function (...args) {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+        timeout = setTimeout(() => {
+          fn.apply(context, args);
+        }, wait);
+      };
+    }
+
+    // 节流，降频
+    function throttle(fn, delay) {
+      let start = Date.now();
+      let context = this;
+      return function (...args) {
+        let now = Date.now();
+        if (now - start > delay) {
+          fn.apply(context, args);
+          start = Date.now();
+        }
+      };
+    }
+
+    function throttle2(fn, delay) {
+      let context = this;
+      let timeout = null;
+      return function (...args) {
+        if (!timeout) {
+          timeout = setTimeout(() => {
+            fn.apply(context, args);
+            timeout = null;
+          }, delay);
+        }
+      };
+    }
+
+    // window.onmousemove = debounce((e) => {
+    //   console.info(e);
+    // }, 1000);
+
+    // window.onmousemove = throttle((e) => {
+    //   console.info(e);
+    // }, 1000);
+
+    window.onmousemove = throttle2((e) => {
+      console.info(e);
+    }, 1000);
+
+    function distinct(arr) {
+      return arr.filter((v, i, array) => {
+        return array.indexOf(v) === i;
+      });
+    }
+
+    let arr = distinct([1, 2, 3, 4, 5, 5, 5, 6, 7, 7, 8, 9]);
+    console.info(arr);
+
+    function flatten(arr) {
+      let res = [...arr];
+      while (res.some((item) => Array.isArray(item))) {
+        res = [].concat(...res);
+      }
+      return res;
+    }
+
+    function flatten2(arr) {
+      let res = [];
+      let len = arr.length;
+      for (let i = 0; i < len; i++) {
+        const item = arr[i];
+        if (Array.isArray(item)) {
+          res.push(...flatten2(item));
+        } else {
+          res.push(item);
+        }
+      }
+      return res;
+    }
+    let testArray = [1, [2, [3, [4, [5, [6, [7, [[[[[[8, ["ha"]]]]]]]]]]]]]];
+    let result = flatten2(testArray);
+    console.log(result);
+  </script>
+</html>
