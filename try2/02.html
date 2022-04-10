@@ -1,25 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body></body>
-  <script>
-    // 实现数组原型的方法，
-    // push、pop、unshift、shift、map、forEach、filter、some、every、reduce
-    // push方法在数组尾部添加一个元素，返回数组的长度
-    // pop删除数组尾部的元素，数组长度减一，返回删除的元素
-    // unshift在数组头部添加一个元素，返回数组的长度
-    // shift删除数组头部元素，数组长度减一，返回删除的元素
-    // map方法接收一个函数，这个函数有三个参数-value, index, array,最后返回一个每一项由执行函数后结果组成的新数组
-    // forEach也接收同样的参数，对每个函数执行传入的函数
-    // filter接收一个参数，根据返回boolean值，决定哪些值被保留，结果是被保留值的数组
-    // some接收能返回boolean值的函数，对每一项执行该函数，如果有结果为true，最后的结果为true
-    // every同some，但要求执行函数后所有值为true时结果才为true
-    // reduce方法对数组中的每个元素按序执行一个由您提供的 reducer 函数，每一次运行 reducer 会将先前元素的计算结果作为参数传入，最后将其结果汇总为单个返回值。
-    
-  </script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body></body>
+    <script>
+        // 实现数组原型的方法，
+        // push、pop、unshift、shift、map、forEach、filter、some、every、reduce
+        // push方法在数组尾部添加一个或多个元素,返回数组的长度
+        Array.prototype.push2 = function (...values) {
+            values.forEach((val) => {
+                let len = this.length;
+                this[len] = val;
+            });
+            return this.length;
+        };
+        // pop方法从数组的尾部删除一个元素,数组长度减1,返回被删除的元素
+        Array.prototype.pop2 = function (value) {
+            let len = this.length;
+            let res = this[len - 1];
+            this[len - 1] = null;
+            this.length = len - 1;
+            return res;
+        };
+        // unshift方法在数组的头部添加一个元素,返回数组的长度
+        Array.prototype.unshift2 = function (value) {
+            let len = this.length;
+            for (let index = len; index > 1; index--) {
+                this[index] = this[index - 1];
+            }
+            this[0] = value;
+            return this.length;
+        };
+        // shift方法在数组的头部删除一个元素,数组的长度减1,返回被删除的元素
+        Array.prototype.shift2 = function () {
+            let len = this.length;
+            let res = this[0];
+            for (let index = 0; index < len - 1; index++) {
+                this[index] = this[index + 1];
+            }
+            this[len - 1] = null;
+            this.length = len - 1;
+            return res;
+        };
+
+        let arr = [9, 8, 7, 6];
+        let count = arr.unshift2(3);
+        console.info(arr, count);
+
+        // map方法,对数组的每一个值执行传入的函数,返回值由执行函数的结果组成的数组
+        // 传入的这个函数有三个参数,value/index/array
+        Array.prototype.map2 = function (callback, thisArg) {
+            let arr = [];
+            let len = this.length;
+            for (let index = 0; index < len; index++) {
+                let res = callback.call(thisArg, this[index], index, this);
+                arr.push(res);
+            }
+            return arr;
+        };
+        // filter方法,也接收一个函数参数,对数组的每一个值执行该方法,根据返回值是否为真对数组进行过滤,得到过滤的新数组
+        Array.prototype.filter2 = function (callback, thisArg) {
+            let arr = [];
+            for (let index = 0; index < len; index++) {
+                let res = callback.call(thisArg, this[index], index, this);
+                if (res) {
+                    arr.push(res);
+                }
+            }
+            return arr;
+        };
+        // some方法,对数组的每一项执行传入的方法,有结果为真,则最终的结果为真
+        Array.prototype.some2 = function (callback, thisArg) {
+            let len = this.length;
+            let res = false;
+            for (let index = 0; index < len; index++) {
+                let res = callback.call(thisArg, this[index], index, this);
+                if (res) {
+                    res = true;
+                    break;
+                }
+            }
+            return res;
+        };
+
+        Array.prototype.every2 = function (callback, thisArg) {
+            let len = this.length;
+            let count = 0;
+            for (let index = 0; index < len; index++) {
+                let res = callback.call(thisArg, this[index], index, this);
+                if (!res) {
+                    break;
+                } else {
+                    count++;
+                }
+            }
+            return count === len;
+        };
+
+        Array.prototype.reduce2 = function (callback, initialValue, thisArg) {
+            let total = initialValue;
+            let len = this.length;
+            for (let index = 0; index < len; index++) {
+                total = callback.call(thisArg, total, this[index], index, this);
+            }
+            return total;
+        };
+
+        // 实现函数的原型方法,call/apply/bind
+        Function.prototype.call2 = function (thisArg, ...args) {
+            const context = thisArg || window;
+            let fn = Symbol();
+            context[fn] = this;
+            let res = context[fn](...args);
+            delete context[fn];
+            return res;
+        };
+
+        Function.prototype.apply2 = function (thisArg, ...args) {
+            const context = thisArg || window;
+            let fn = Symbol();
+            context[fn] = this;
+            let res = context[fn](args);
+            delete context[fn];
+            return res;
+        };
+
+        Function.prototype.bind2 = function (thisArg, ...args) {
+            let fn = this;
+            return function () {
+                return fn.call(thisArg, ...args);
+            };
+        };
+
+        let user = {
+            name: "LIB",
+            age: 24
+        };
+        function getInfo() {
+            return `My name is ${this.name}, my age is ${this.age}.`;
+        }
+        let res = getInfo.apply2(user);
+        console.info(res);
+
+        res = getInfo.bind2(user)();
+        console.info(res);
+    </script>
 </html>

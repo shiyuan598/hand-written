@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body></body>
+    <script>
+        "use strict";
+        function F(name) {
+            this.name = name;
+        }
+        F.prototype.getName = function () {
+            return `My name is ${this.name}.`;
+        };
+
+        function S(name, age) {
+            F.call(this, name);
+            this.age = age;
+        }
+        // Object.setPrototypeOf(S.prototype, F.prototype);
+        S.prototype = Object.create(F.prototype);
+
+        S.prototype.getAge = function () {
+            return `My age is ${this.age}.`;
+        };
+
+        S.prototype.constructor = S;
+
+        let girl = new S("xcJxJx", 24);
+        let res = girl.getName();
+        console.info(res);
+        res = girl.getAge();
+        console.info(res);
+
+        // es6使用extends
+
+        // new四件事
+        // 1.创建一个空对象
+        // 2.对该对象进行原型连接
+        // 3.把新对象作为this,执行构造函数
+        // 4.构造函数有显式的返回值,就返回该值,否则就把新对象返回
+        function create(constructor, ...args) {
+            let obj = {};
+            obj.__proto__ = constructor.prototype;
+            let res = constructor.call(obj, ...args);
+            if (res !== undefined) {
+                return res;
+            }
+            return obj;
+        }
+
+        let lyIaBc = create(S, "dodo", 27);
+        console.info(lyIaBc.getName());
+        console.info(lyIaBc.getAge());
+
+        // create,根据提供的原型创建一个新对象,并添加属性
+        Object.prototype.create2 = function (proto, properties) {
+            let obj = {};
+            obj.__proto__ = proto;
+            Object.defineProperties(obj, properties);
+            return obj;
+        };
+
+        // instanceof,判断操作数的原型是否在在左操作数的原型链上
+        function isInstanceof(obj, Constructor) {
+            let prototype = Constructor.prototype;
+            let proto = obj.__proto__;
+            while (proto) {
+                if (proto === prototype) {
+                    return true;
+                } else {
+                    proto = proto.__proto__;
+                }
+            }
+            return false;
+        }
+    </script>
+</html>

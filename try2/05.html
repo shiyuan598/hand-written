@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body></body>
+    <script>
+        // Promise有三个状态,状态一经改变就不会再变了
+        // 创建Promise时接收一个执行器函数,需要给这个执行器提供两个参数resolve/reject来改变状态,
+        // 调用then方法,能得到promise成功的value或失败的reason,then可以链式操作
+        // 有静态方法resolve/reject/all/race/some
+        class Promise2 {
+            static PENDING = "pending";
+            static FULFILLED = "fulfilled";
+            static REJECTED = "rejected";
+
+            constructor(executor) {
+                this.value = null;
+                this.status = Promise2.PENDING;
+                this.callbacks = [];
+                executor(this.resolve.bind(this), this.reject.bind(this));
+            }
+
+            resolve(value) {
+                setTimeout(() => {
+                    if (this.status === Promise2.PENDING) {
+                        this.status = Promise2.FULFILLED;
+                        this.value = value;
+                        this.callbacks.forEach((callback) => {
+                            callback.onFulfilled(this.value);
+                        });
+                    }
+                }, 0);
+            }
+
+            reject(reason) {
+                setTimeout(() => {
+                    if (this.status === Promise2.PENDING) {
+                        this.status = Promise2.REJECTED;
+                        this.value = reason;
+                        this.callbacks.forEach((callback) => {
+                            callback.onRejected(this.value);
+                        });
+                    }
+                }, 0);
+            }
+
+            then(onFulfilled, onRejected) {
+                return new Promise2((resolve, reject) => {
+                    if (this.status === Promise2.PENDING) {
+                        this.callbacks.push({
+                            onFulfilled: () => {
+                                let res = onFulfilled(this.value);
+                                resolve(res);
+                            },
+                            onRejected: () => {
+                                let res = onRejected(this.value);
+                                resolve(res);
+                            }
+                        });
+                    }
+                    if (this.status === Promise2.FULFILLED) {
+                        setTimeout(() => {
+                            let res = onFulfilled(this.value);
+                            resolve(res);
+                        }, 0);
+                    }
+                    if (this.status === Promise2.REJECTED) {
+                        setTimeout(() => {
+                            let res = onRejected(this.value);
+                            resolve(res);
+                        }, 0);
+                    }
+                });
+            }
+
+            static resolve(value) {
+                return new Promise2((resolve, reject) => {
+                    if (value instanceof Promise2) {
+                        value.then(resolve, reject);
+                    } else {
+                        resolve(value);
+                    }
+                });
+            }
+
+            static reject(value) {
+                return new Promise2((resolve, reject) => {
+                    reject(value);
+                });
+            }
+
+            static all(promises) {
+                return new Promise2((resolve, reject) => {
+                    let res = [];
+                    let len = promises.length;
+                    promises.forEach((promise) => {
+                        promise.then((v) => {
+                            res.push(v);
+                            if (res.length === len) {
+                                resolve(res);
+                            }
+                        }, reject);
+                    });
+                });
+            }
+
+            static race(promises) {
+                return new Promise2((resolve, reject) => {
+                    promises.forEach((promise) => {
+                        promise.then(resolve, reject);
+                    });
+                });
+            }
+        }
+
+        let p = new Promise2((resolve, reject) => {
+            setTimeout(() => {
+                resolve("success");
+                reject("error");
+            });
+            console.info(1);
+            // reject("error");
+            // resolve("success");
+            console.info(2);
+        })
+            .then(
+                (v) => {
+                    console.info("then:", v);
+                    return "then 1 success.";
+                },
+                (r) => {
+                    console.info("then:", r);
+                    return "then 1 error.";
+                }
+            )
+            .then((v) => {
+                console.info(v);
+            });
+        console.info(p);
+
+        let p2 = Promise.reject(Promise.resolve(234));
+        p2.then(
+            (v) => {
+                console.info("v:", v);
+            },
+            (r) => {
+                console.info("r:", r);
+            }
+        );
+        console.info(p2);
+        console.info(Promise)
+    </script>
+</html>

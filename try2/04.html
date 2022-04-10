@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body></body>
+    <script>
+        // 订阅发布模式
+        // eventBus提供添加/删除订阅者,触发事件的功能
+        // 订阅者通过on订阅事件,发布者通过emit触发事件
+        class EventBus {
+            constructor() {
+                this.callbackList = {};
+            }
+            on(eventName, callback) {
+                if (this.callbackList[eventName]) {
+                    this.callbackList[eventName].push(callback);
+                } else {
+                    this.callbackList[eventName] = [callback];
+                }
+            }
+
+            off(eventName, callback) {
+                let callbacks = this.callbackList[eventName];
+                this.callbackList[eventName] = callbacks.filter(
+                    (item) => item !== callback
+                );
+            }
+
+            emit(eventName, ...args) {
+                this.callbackList[eventName].forEach((callback) => {
+                    callback(...args);
+                });
+            }
+        }
+
+        let obj = {
+            name: "xcJxJx",
+            age: 25
+        };
+        let eventBus = new EventBus();
+
+        eventBus.on("success", () => {
+            console.info(`My name is ${obj.name}.`);
+        });
+        eventBus.on("error", () => {
+            console.info(`My name is XXX.`);
+        });
+
+        new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject();
+                resolve();
+            }, 2000);
+        }).then(
+            () => {
+                eventBus.emit("success");
+            },
+            () => {
+                eventBus.emit("error");
+            }
+        );
+
+        class Subject {
+            constructor() {
+                this.observerList = [];
+            }
+            addObserver(observer) {
+                this.observerList.push(observer);
+            }
+            notify(msg) {
+                this.observerList.forEach((observer) => {
+                    observer.update(msg);
+                });
+            }
+        }
+        class Observer {
+            constructor(callback) {
+                this.callback = callback;
+            }
+            update(msg) {
+                this.callback(msg);
+            }
+        }
+        let honestFirst = new Observer((msg) => {
+            console.info(`You say "${msg}", I'll wish you happiness.`)
+        });
+        let honestSecond = new Observer((msg) => {
+            console.info(`You say "${msg}", We are still good friends.`)
+        });
+        let honestThird = new Observer((msg) => {
+            console.info(`You say "${msg}", Bitch go to die!`)
+        });
+        let greenTea = new Subject();
+        new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (Math.random() > 0.5)
+                {
+                    reject();
+                
+                } else {
+                    resolve();
+                }
+            }, 2000);
+        }).then(
+            () => {
+                greenTea.notify("I broken up.");
+            },
+            () => {
+                greenTea.notify("I have met someone.");
+            }
+        );
+        greenTea.addObserver(honestFirst);
+        greenTea.addObserver(honestSecond);
+        greenTea.addObserver(honestThird);
+    </script>
+</html>

@@ -27,6 +27,6 @@ S.prototype.getAge = function() {
     return `My length is ${this.age}.`;
 }
 
-let s = new S("xcjxjx", 25);
+let s = new S("xcJxJx", 25);
 console.info(s.getName());
 console.info(s.getAge());
